@@ -1,0 +1,8 @@
+@startuml
+rectangle "addTo3" as d18d0f77 
+circle "INIT" as 4646f40d 
+circle "END" as d4988928 
+4646f40d --> d18d0f77 : i_adder
+d18d0f77 --> d4988928 : added
+
+@enduml
