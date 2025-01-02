@@ -8,10 +8,8 @@ class SMTest {
             longTimeFunc(5, "task1")
             "1_2" to it
         }
-        action("task2") {
-            longTimeFunc(3, "task2")
-            "2_e" to it
-        }
+
+        mock("task2","2_e")
         init().to(
             "task1"
         ).on("i_1")
@@ -23,16 +21,9 @@ class SMTest {
     fun test() {
         val runtime = TasksRuntime(dag)
         runtime.start("i_1")
-        Thread.sleep(5000)
+        runtime.waitForEnd()
     }
+
 }
 
 
-fun longTimeFunc(count: Int, name: String) {
-    var c = 0
-    while (c < count) {
-        println("$name - $c")
-        c++
-        Thread.sleep(100)
-    }
-}

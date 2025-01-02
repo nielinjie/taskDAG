@@ -5,21 +5,22 @@ import kotlin.io.path.Path
 import kotlin.io.path.writeText
 
 class DiagramTest() {
+    val logger = org.slf4j.LoggerFactory.getLogger(DiagramTest::class.java)
     private val adder = { it: Context ->
         longTimeFunc(5, "adder")
-        println("add 1")
+        logger.debug("add 1")
         "added" to it.toMutableMap().also {
             it.put("sum", 1 + (it.get("sum") ?: 0) as Int)
         }
     }
     private val lessThan3 = { it: Context ->
         val count = ((it.get("sum") ?: 0) as Int)
-        println("count = $count")
+        logger.debug("count = $count")
         if (count < 3) {
-            println("count < 3, to adder")
+            logger.debug("count < 3, to adder")
             "c_a" to it
         } else {
-            println("count >= 3, to end")
+            logger.debug("count >= 3, to end")
             "c_e" to it
         }
     }

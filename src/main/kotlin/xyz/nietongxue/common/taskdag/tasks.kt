@@ -75,7 +75,7 @@ class TaskWrap<E : Any>(val task: Task<E>) {
 class TasksRuntime<E : Any>(
     val dag: TaskDAG<E>,
 ) {
-
+    val logger = org.slf4j.LoggerFactory.getLogger(TasksRuntime::class.java)
 
     val builder = StateMachineBuilder.builder<String, E>()
     val tasksW = dag.tasks.map { TaskWrap(it) }
@@ -125,19 +125,23 @@ class TasksRuntime<E : Any>(
         sm.sendEvent(Mono.just(MessageBuilder.withPayload(event).build())).subscribe()
     }
 
-    fun waitForEnd() {
+    fun waitForEnd(): Context {
         countdown.await()
+        return this.sm.extendedState.variables as Context
     }
 
     fun action(task: Task<E>): Action<String, E> {
         return object : Action<String, E> {
             override fun execute(context: StateContext<String, E>?) {
+                logger.debug("executing task ${task.name}")
                 val c = context?.stateMachine?.extendedState?.variables as? Context
                 try {
                     val (result, effect) = task.action(c ?: emptyMap())
                     context?.stateMachine?.extendedState?.variables?.putAll(effect)
+                    logger.debug("task ${task.name} executed, result: $result")
                     context?.stateMachine?.sendEvent(Mono.just(MessageBuilder.withPayload(result).build()))
                         ?.subscribe()
+                    logger.debug("task ${task.name} event sent")
                 } catch (e: Exception) {
                     val result = task.exception(c ?: emptyMap(), e)
                     context?.stateMachine?.sendEvent(Mono.just(MessageBuilder.withPayload(result).build()))

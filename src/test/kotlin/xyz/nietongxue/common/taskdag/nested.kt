@@ -1,23 +1,25 @@
 package xyz.nietongxue.common.taskdag
 
 import org.junit.jupiter.api.Test
+import org.slf4j.LoggerFactory
 
 class NestedTest() {
+    val logger = LoggerFactory.getLogger(NestedTest::class.java)
     private val adder = { it: Context ->
         longTimeFunc(5, "adder")
-        println("add 1")
+        logger.debug("add 1")
         "added" to it.toMutableMap().also {
             it.put("sum", 1 + (it.get("sum") ?: 0) as Int)
         }
     }
     private val lessThan3 = { it: Context ->
-        val count = ((it.get("sum") ?: 0) as Int)
-        println("count = $count")
+        val count: Int = (it.get("sum") ?: 0) as Int
+        logger.debug("count = $count")
         if (count < 3) {
-            println("count < 3, to adder")
+            logger.debug("count < 3, to adder")
             "c_a" to it
         } else {
-            println("count >= 3, to end")
+            logger.debug("count >= 3, to end")
             "c_e" to it
         }
     }
@@ -33,7 +35,6 @@ class NestedTest() {
             "adder".to("condition").on("added")
             "condition".to("adder").on("c_a")
             "condition".to(end()).on("c_e")
-
         }
 
     @Test

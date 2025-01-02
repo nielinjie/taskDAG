@@ -20,9 +20,8 @@ class Diagram<E : Any>(val taskDAG: TaskDAG<E>) {
 
     private fun toPlantUMLInner(prefix: String = "", extendNested: Boolean = true): String {
         fun nameToId(name: String): String {
-
-            return (prefix + "_" + name).also{
-              logger.info("nameToId: $it")
+            return (prefix + "_" + name).also {
+                logger.debug("nameToId: $it")
             }.md5().substring(0, 8)
         }
 

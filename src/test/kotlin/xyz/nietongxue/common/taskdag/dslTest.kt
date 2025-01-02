@@ -38,13 +38,13 @@ class DslTest {
     }
 
     @Test
-    fun shortcuts(){
+    fun shortcuts() {
         val dag = dag {
             init().to(
                 action("task1") {
                     "1_2" to it
                 }).on("init_1")
-            "task1".to(fire("task2","2_end")).on("1_2")
+            "task1".to(fire("task2", "2_end")).on("1_2")
             "task2".to(end()).on("2_end")
         }
         assertThat(dag).isNotNull

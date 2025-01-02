@@ -1,8 +1,26 @@
 @startuml
-rectangle "addTo3" as d18d0f77 
+rectangle "describer" as abd7b115 
+rectangle "sequence" as 7706a317 
+rectangle "generic" as 30ac8ee0 
+rectangle "evaluator" as 5c59b9a5 {
+rectangle "evaluate" as d5bade2b 
+rectangle "review" as e36c1743 
+circle "INIT" as 7ec95d87 
+circle "END" as 32e25913 
+7ec95d87 --> d5bade2b : init
+d5bade2b --> e36c1743 : error
+e36c1743 --> d5bade2b : retry
+d5bade2b --> 32e25913 : unknown
+d5bade2b --> 32e25913 : ok
+
+}
 circle "INIT" as 4646f40d 
 circle "END" as d4988928 
-4646f40d --> d18d0f77 : i_adder
-d18d0f77 --> d4988928 : added
+4646f40d --> abd7b115 : init
+abd7b115 --> 7706a317 : sequence
+abd7b115 --> 30ac8ee0 : generic
+30ac8ee0 --> 5c59b9a5 : done
+7706a317 --> 5c59b9a5 : done
+5c59b9a5 --> d4988928 : ok
 
 @enduml

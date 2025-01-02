@@ -1,8 +1,11 @@
 package xyz.nietongxue.common.taskdag
 
+import org.slf4j.LoggerFactory
+
 class TaskDAGBuilder<E : Any>() {
     val tasks = mutableListOf<Task<E>>()
     val trans = mutableListOf<Trans<E>>()
+    val logger = LoggerFactory.getLogger(TaskDAGBuilder::class.java)
     fun task(name: String, block: TaskBuilder<E>.() -> Unit): Task<E> {
         val builder = TaskBuilder<E>(name)
         builder.block()
