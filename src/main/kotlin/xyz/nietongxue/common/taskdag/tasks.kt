@@ -51,10 +51,9 @@ class TaskWrap<E : Any>(val task: Task<E>) {
     val name = task.name
 }
 
-fun <E : Any> TaskDAG<E>.start(event: E): TasksRuntime<E> {
+fun <E : Any> TaskDAG<E>.start(event: E, context: Context = emptyMap()): TasksRuntime<E> {
     return TasksRuntime(this).also {
-
-        it.start(event)
+        it.start(event, context)
     }
 }
 
@@ -76,9 +75,9 @@ class TasksRuntime<E : Any>(
 //        if (this.from == this.to) {
 //            builder.withInternal().source(this.from).event(event)
 //        } else {
-            builder
-                .withExternal()
-                .source(this.from).target(to).event(event)
+        builder
+            .withExternal()
+            .source(this.from).target(to).event(event)
     }
 
     val countdown: CountDownLatch = CountDownLatch(1)

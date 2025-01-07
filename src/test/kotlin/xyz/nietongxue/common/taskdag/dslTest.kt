@@ -3,6 +3,8 @@ package xyz.nietongxue.common.taskdag
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
+import xyz.nietongxue.common.taskdag.EventDefaults.START
+import xyz.nietongxue.common.taskdag.EventDefaults.SUCCESS
 
 class DslTest {
     @Test
@@ -87,5 +89,17 @@ class DslTest {
                 "task2".to("END").on("2_end")
             }
         }
+    }
+
+    @Test
+    fun dslNew() {
+        dag {
+            mock("t1", SUCCESS)
+            startFrom("t1")
+            "t1".to(end()).on(SUCCESS)
+        }.start(START).also {
+            it.waitForEnd()
+        }
+
     }
 }

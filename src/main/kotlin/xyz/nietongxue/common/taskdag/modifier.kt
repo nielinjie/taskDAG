@@ -45,31 +45,21 @@ class DefaultExceptionTrans<E : Any>(val exceptionEndName: String, val exception
 }
 
 
-class DefaultStartNodeConfig<E : Any> {
-    fun config(taskDAG: TaskDAG<E>): TaskDAG<E> {
-        val init = taskDAG.tasks.firstOrNull() { it is InitTask }
-        if (init == null) {
-            val newInit = justInit<E>()
-            return TaskDAG(
-                tasks = listOf(newInit) + taskDAG.tasks, trans = taskDAG.trans
-            )
-        } else
-            return taskDAG
+class DefaultStartNodeTrans<E : Any>(val taskName: String, val startEvent: E) : Modifier<E> {
+    override fun modify(dag: TaskDAG<E>): TaskDAG<E> {
+        val start = dag.tasks.filterIsInstance<InitTask<*>>().firstOrNull()
+        var newStart: InitTask<E>? = null
+        if (start == null) {
+            newStart = justInit<E>()
+        }
+        val startTrans = Trans((start ?: newStart)!!.name, taskName, startEvent)
+        return TaskDAG(
+            tasks = (newStart?.let { dag.tasks + it } ?: dag.tasks),
+            trans = (listOf(startTrans) + dag.trans).distinct()
+        )
     }
 }
 
-class DefaultEndNodeConfig<E : Any> {
-    fun config(taskDAG: TaskDAG<E>): TaskDAG<E> {
-        val ends = taskDAG.tasks.filter { it is EndTask }
-        if (ends.isEmpty()) {
-            val newEnd = justEnd<E>()
-            return TaskDAG(
-                tasks = taskDAG.tasks + listOf(newEnd), trans = taskDAG.trans
-            )
-        } else {
-            return taskDAG
-        }
-    }
-}
+
 
 
