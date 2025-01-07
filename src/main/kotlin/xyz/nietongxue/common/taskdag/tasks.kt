@@ -44,37 +44,27 @@ abstract class EndTask<E : Any> : Task<E> {
     }
 }
 
-class Trans<E : Any>(val from: String, val to: String, val event: E)
+data class Trans<E : Any>(val from: String, val to: String, val event: E)
 
-class TaskDAG<E : Any>(
-    val tasks: List<Task<E>> = emptyList(),
-    val trans: List<Trans<E>> = emptyList()
-) {
-    init {
-        val init = tasks.filter { it is InitTask<*> }
-        val ends = tasks.filter { it is EndTask<*> }
-        require(init.size == 1) { "init task should be only one" }
-        require(ends.size > 0) { "end task should be at least one" }
-        val names = tasks.map { it.name }
-        require(trans.all {
-            it.from in names && it.to in names
-        }) {
-            "trans should be in tasks"
-        }
-    }
-
-    fun startEvent(): E {
-        return trans.first { it.from == tasks.first { it is InitTask<*> }.name }.event
-    }
-}
 
 class TaskWrap<E : Any>(val task: Task<E>) {
     val name = task.name
 }
 
+fun <E : Any> TaskDAG<E>.start(event: E): TasksRuntime<E> {
+    return TasksRuntime(this).also {
+
+        it.start(event)
+    }
+}
+
 class TasksRuntime<E : Any>(
     val dag: TaskDAG<E>,
 ) {
+    init {
+        dag.validate().getOrThrow()
+    }
+
     val logger = org.slf4j.LoggerFactory.getLogger(TasksRuntime::class.java)
 
     val builder = StateMachineBuilder.builder<String, E>()
@@ -83,9 +73,12 @@ class TasksRuntime<E : Any>(
     val ends = tasksW.filter { it.task is EndTask<*> }
     val normalTasks = tasksW.filter { it.task !is InitTask<*> && it.task !is EndTask<*> }
     fun Trans<E>.build(builder: StateMachineTransitionConfigurer<String, E>) {
-        builder
-            .withExternal()
-            .source(this.from).target(to).event(event)
+//        if (this.from == this.to) {
+//            builder.withInternal().source(this.from).event(event)
+//        } else {
+            builder
+                .withExternal()
+                .source(this.from).target(to).event(event)
     }
 
     val countdown: CountDownLatch = CountDownLatch(1)
@@ -120,7 +113,8 @@ class TasksRuntime<E : Any>(
         })
     }
 
-    fun start(event: E) {
+    fun start(event: E, context: Context = emptyMap()) {
+        sm.extendedState.variables.putAll(context)
         sm.startReactively().subscribe()
         sm.sendEvent(Mono.just(MessageBuilder.withPayload(event).build())).subscribe()
     }

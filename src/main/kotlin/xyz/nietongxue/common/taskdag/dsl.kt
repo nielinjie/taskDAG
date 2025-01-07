@@ -2,14 +2,39 @@ package xyz.nietongxue.common.taskdag
 
 import org.slf4j.LoggerFactory
 
+object TaskDefaults {
+    const val INIT = "INIT"
+    const val END = "END"
+
+}
+
+object EventDefaults {
+    const val START = "start"
+    const val SUCCESS = "success"
+    const val EXCEPTION = "exception"
+}
+
+
+
 class TaskDAGBuilder<E : Any>() {
     val tasks = mutableListOf<Task<E>>()
     val trans = mutableListOf<Trans<E>>()
-    val logger = LoggerFactory.getLogger(TaskDAGBuilder::class.java)
+    val modifiers = mutableListOf<Modifier<E>>()
+
+    fun modifier(modifier: Modifier<E>) {
+        this.modifiers.add(modifier)
+    }
+
     fun task(name: String, block: TaskBuilder<E>.() -> Unit): Task<E> {
         val builder = TaskBuilder<E>(name)
         builder.block()
         return builder.build().also {
+            tasks.add(it)
+        }
+    }
+
+    fun task(task: Task<E>): Task<E> {
+        return task.also {
             tasks.add(it)
         }
     }
@@ -33,6 +58,7 @@ class TaskDAGBuilder<E : Any>() {
             }
         }
     }
+
     fun fire(name: String, event: E): Task<E> {
         return task(name) {
             this.outEvent = event
@@ -188,7 +214,7 @@ class TaskBuilder<E : Any>(val _name: String?) {
         } else if (dag != null && action == null) {
             this.action = { context ->
                 val runtime = TasksRuntime(dag!!.first!!)
-                runtime.start(dag!!.first.startEvent())
+                runtime.start(dag!!.first.startEvent().getOrThrow())
                 runtime.waitForEnd()
                 dag!!.second to context
             }
@@ -233,6 +259,10 @@ class TransBuilder2<E : Any>() {
 fun <E : Any> dag(block: TaskDAGBuilder<E>.() -> Unit): TaskDAG<E> {
     val builder: TaskDAGBuilder<E> = TaskDAGBuilder<E>()
     builder.block()
-    return TaskDAG(builder.tasks, builder.trans)
+    return TaskDAG(builder.tasks, builder.trans).let {
+        builder.modifiers.fold(it) { acc, modifier ->
+            modifier.modify(acc)
+        }
+    }
 }
 

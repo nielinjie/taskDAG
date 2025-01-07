@@ -3,13 +3,14 @@ package xyz.nietongxue.common.taskdag
 import org.junit.jupiter.api.Test
 
 class SMTest {
+    private val logger: org.slf4j.Logger = org.slf4j.LoggerFactory.getLogger(SMTest::class.java)
     val dag = dag {
         action("task1") {
             longTimeFunc(5, "task1")
             "1_2" to it
         }
 
-        mock("task2","2_e")
+        this.mock("task2","2_e")
         init().to(
             "task1"
         ).on("i_1")
