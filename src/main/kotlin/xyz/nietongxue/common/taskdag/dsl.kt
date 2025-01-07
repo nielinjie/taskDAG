@@ -8,11 +8,6 @@ object TaskDefaults {
 
 }
 
-object EventDefaults {
-    const val START = "start"
-    const val SUCCESS = "success"
-    const val EXCEPTION = "exception"
-}
 
 
 

@@ -1,8 +1,7 @@
-package xyz.nietongxue.common.taskdag
+package xyz.nietongxue.common.taskdag.stringEvent
 
-import xyz.nietongxue.common.taskdag.EventDefaults.EXCEPTION
-import xyz.nietongxue.common.taskdag.EventDefaults.START
-
+import xyz.nietongxue.common.taskdag.*
+import xyz.nietongxue.common.taskdag.stringEvent.EventDefaults.EXCEPTION
 
 class Retry(val task: Task<String>, val times: Int = 3, val catchingEvent: String = EXCEPTION) : Task<String> {
 
@@ -37,12 +36,4 @@ fun TaskDAGBuilder<String>.retry(
     // add retrying trans
     this.modifier(AddTrans(Trans(retry.name, retry.name, "goto_${task.name}_retry")))
 
-}
-
-fun TaskDAGBuilder<String>.defaultCatching(endTaskName: String = "END_EXCEPTION") {
-    this.modifier(DefaultExceptionTrans(endTaskName, EXCEPTION))
-}
-
-fun TaskDAGBuilder<String>.startFrom(taskName: String) {
-    this.modifier(DefaultStartNodeTrans(taskName, START))
 }

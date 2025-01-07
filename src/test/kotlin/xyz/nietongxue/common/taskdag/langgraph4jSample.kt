@@ -2,6 +2,7 @@ package xyz.nietongxue.common.taskdag
 
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
+import xyz.nietongxue.common.taskdag.diagram.Diagram
 import kotlin.io.path.Path
 import kotlin.io.path.writeText
 

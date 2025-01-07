@@ -1,11 +1,13 @@
 package xyz.nietongxue.common.taskdag
 
 import org.junit.jupiter.api.Test
-import xyz.nietongxue.common.taskdag.EventDefaults.EXCEPTION
-import xyz.nietongxue.common.taskdag.EventDefaults.START
-import xyz.nietongxue.common.taskdag.EventDefaults.SUCCESS
 import xyz.nietongxue.common.taskdag.TaskDefaults.END
 import xyz.nietongxue.common.taskdag.TaskDefaults.INIT
+import xyz.nietongxue.common.taskdag.stringEvent.EventDefaults.EXCEPTION
+import xyz.nietongxue.common.taskdag.stringEvent.EventDefaults.START
+import xyz.nietongxue.common.taskdag.stringEvent.EventDefaults.SUCCESS
+import xyz.nietongxue.common.taskdag.stringEvent.defaultCatching
+import xyz.nietongxue.common.taskdag.stringEvent.retry
 
 class RetryTest() {
     @Test

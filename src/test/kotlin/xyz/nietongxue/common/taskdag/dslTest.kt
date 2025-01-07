@@ -3,13 +3,14 @@ package xyz.nietongxue.common.taskdag
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import xyz.nietongxue.common.taskdag.EventDefaults.START
-import xyz.nietongxue.common.taskdag.EventDefaults.SUCCESS
+import xyz.nietongxue.common.taskdag.stringEvent.EventDefaults.START
+import xyz.nietongxue.common.taskdag.stringEvent.EventDefaults.SUCCESS
+import xyz.nietongxue.common.taskdag.stringEvent.startFrom
 
 class DslTest {
     @Test
     fun dsl() {
-        val dag = dag {
+        val dag = dag<String> {
             init().to(
                 action("task1") {
                     "task12end" to it

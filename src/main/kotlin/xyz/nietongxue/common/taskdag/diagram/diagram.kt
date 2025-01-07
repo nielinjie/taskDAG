@@ -1,7 +1,8 @@
-package xyz.nietongxue.common.taskdag
+package xyz.nietongxue.common.taskdag.diagram
 
 import org.slf4j.LoggerFactory
 import xyz.nietongxue.common.base.md5
+import xyz.nietongxue.common.taskdag.*
 
 class Diagram<E : Any>(val taskDAG: TaskDAG<E>) {
     val normalTasks = taskDAG.tasks.filter { it !is InitTask<*> && it !is EndTask<*> }
